@@ -7,10 +7,9 @@
     <title>PlantAR — 植物识别 AR 展示</title>
     <link rel="stylesheet" href="./styles.css" />
 
-    <!-- 使用与 Gunify 完全相同的 CDN -->
-    <script
-        src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <!-- A-Frame + AR.js (Marker 版本，比 NFT 更稳定) -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -18,7 +17,7 @@
 
 <body style="margin: 0px; overflow: hidden">
 
-    <!-- Loading (AR.js 会自动隐藏这个元素) -->
+    <!-- Loading -->
     <div class="arjs-loader">
         <div class="spinner"></div>
         <p class="loading-text">正在初始化 AR...</p>
@@ -34,9 +33,6 @@
     <div class="icon-btn info-icon">
         <i class="fa-solid fa-info"></i>
     </div>
-    <div class="icon-btn rotate-icon">
-        <i class="fa-solid fa-rotate"></i>
-    </div>
     <div class="icon-btn scale-icon">
         <i class="fa-solid fa-expand"></i>
     </div>
@@ -45,12 +41,12 @@
     <div id="scanHint"
         style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); color: white; text-align: center; z-index: 100; pointer-events: none;">
         <div style="background: rgba(0,0,0,0.6); padding: 15px 25px; border-radius: 20px; backdrop-filter: blur(5px);">
-            <i class="fa-solid fa-camera" style="font-size: 24px; margin-bottom: 8px; color: #4ade80;"></i>
-            <p style="margin: 0; font-size: 14px;">请对准植物识别图</p>
+            <i class="fa-solid fa-qrcode" style="font-size: 24px; margin-bottom: 8px; color: #4ade80;"></i>
+            <p style="margin: 0; font-size: 14px;">请扫描 Hiro 标记</p>
         </div>
     </div>
 
-    <!-- 浮动信息 UI (初始隐藏) -->
+    <!-- 浮动信息 UI (识别成功后显示) -->
     <div class="floating-info-container" id="floatingInfo" style="display: none;">
         <div class="float-card float-top" id="floatName">
             <div class="float-card-inner">
@@ -124,7 +120,7 @@
             </div>
             <span class="plant-category" id="plantCategory">多年生草本</span>
         </div>
-        <p id="plantDescription">滴水观音又称海芋、象耳芋，是天南星科海芋属植物。因其叶片巨大如象耳，且在湿度大时叶尖会滴水而得名。</p>
+        <p id="plantDescription">滴水观音又称海芋、象耳芋，是天南星科海芋属植物。因其叶片巨大如象耳，且在湿度大时叶尖会滴水而得名。是常见的室内观叶植物，但全株有毒，需小心养护。</p>
         <div class="go-corner">
             <div class="go-close close-wrapper">
                 <i class="fa-solid fa-xmark close-icon"></i>
@@ -132,25 +128,22 @@
         </div>
     </div>
 
-    <!-- A-Frame AR 场景 (使用与 Gunify 完全相同的配置) -->
-    <a-scene vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true;" embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-        <!-- NFT Marker: 滴水观音 -->
-        <a-nft type="nft" id="elephantEarMarker" url="./markers/elephant_ear/elephant_ear" smooth="true"
-            smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
-            <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="80 80 80"
-                position="50 0 -100" rotation="0 0 0"></a-entity>
-        </a-nft>
+    <!-- A-Frame AR 场景 (Hiro Marker 版本) -->
+    <a-scene embedded
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
+        <!-- Hiro Marker -->
+        <a-marker preset="hiro" id="hiroMarker">
+            <!-- 3D 植物模型 -->
+            <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="0.05 0.05 0.05"
+                position="0 0 0" rotation="-90 0 0"></a-entity>
+        </a-marker>
 
-        <!-- Lighting -->
-        <a-entity light="type: ambient; intensity: 2"></a-entity>
-        <a-entity light="type: directional; intensity: 3" position="1 1 1"></a-entity>
-
-        <!-- Camera -->
+        <!-- 摄像头实体 -->
         <a-entity camera></a-entity>
     </a-scene>
 
-    <script src="./script-nft.js" defer></script>
+    <script src="./script-marker.js"></script>
 </body>
 
 </html>
