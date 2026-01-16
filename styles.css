@@ -1,0 +1,1224 @@
+/**
+ * PlantAR - 植物识别 AR Demo
+ * 样式表 - 全屏 3D 模型覆盖版本
+ */
+
+/* ==================== 基础重置 ==================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", Tahoma, sans-serif;
+  background: #000;
+  color: white;
+  min-height: 100vh;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ==================== 加载动画 ==================== */
+.arjs-loader {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, #0d2818 0%, #1a472a 100%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease;
+}
+
+.spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.spinner::before {
+  content: "🌿";
+  position: absolute;
+  font-size: 40px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse-leaf 1.5s ease-in-out infinite;
+}
+
+.spinner::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: #4ade80;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #4ade80;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+@keyframes pulse-leaf {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== 品牌水印 ==================== */
+.watermark {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 12px 20px;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg,
+      rgba(74, 222, 128, 0.2) 0%,
+      rgba(34, 197, 94, 0.15) 100%);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 200;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.watermark i {
+  color: #4ade80;
+  font-size: 20px;
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+@keyframes gentle-sway {
+
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ==================== 控制按钮 ==================== */
+.icon-btn {
+  position: fixed;
+  right: 20px;
+  width: 55px;
+  height: 55px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  outline: 0;
+  border: 0;
+  background: linear-gradient(135deg,
+      rgba(74, 222, 128, 0.9) 0%,
+      rgba(34, 197, 94, 0.9) 100%);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.icon-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.icon-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3),
+    inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.icon-btn.pulse {
+  animation: btn-pulse 0.3s ease;
+}
+
+@keyframes btn-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.info-icon {
+  top: 20px;
+}
+
+.rotate-icon {
+  top: 90px;
+}
+
+.scale-icon {
+  top: 160px;
+}
+
+/* ==================== 触摸提示 ==================== */
+.touch-hint {
+  position: fixed;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 150;
+  transition: opacity 0.5s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.touch-hint i {
+  color: #4ade80;
+  font-size: 18px;
+  animation: point-anim 1.5s ease-in-out infinite;
+}
+
+.touch-hint span {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+@keyframes point-anim {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+/* ==================== 信息面板 - 无图片版本 ==================== */
+.info-panel {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  background: linear-gradient(135deg,
+      rgba(15, 23, 42, 0.95) 0%,
+      rgba(30, 41, 59, 0.95) 100%);
+  color: #fff;
+  padding: 24px;
+  border-radius: 20px;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-align: left;
+  z-index: 300;
+  max-width: 420px;
+  width: 90%;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(74, 222, 128, 0.1) inset;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(30px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.info-panel.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 面板滚动条美化 */
+.info-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.info-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.info-panel::-webkit-scrollbar-thumb {
+  background: rgba(74, 222, 128, 0.4);
+  border-radius: 2px;
+}
+
+/* ==================== 面板头部 ==================== */
+.info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #4ade80;
+  letter-spacing: 1px;
+}
+
+.plant-english {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.plant-category {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #0f172a;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ==================== 描述文本 ==================== */
+.info-panel p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ==================== 规格卡片 ==================== */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.spec {
+  background: linear-gradient(135deg,
+      rgba(74, 222, 128, 0.1) 0%,
+      rgba(34, 197, 94, 0.05) 100%);
+  padding: 12px 8px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  transition: all 0.3s ease;
+}
+
+.spec:hover {
+  background: linear-gradient(135deg,
+      rgba(74, 222, 128, 0.2) 0%,
+      rgba(34, 197, 94, 0.1) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.15);
+}
+
+.spec i {
+  display: block;
+  font-size: 20px;
+  color: #4ade80;
+  margin-bottom: 6px;
+}
+
+.spec-label {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spec-value {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ==================== 趣闻卡片 ==================== */
+.fun-fact {
+  background: linear-gradient(135deg,
+      rgba(251, 191, 36, 0.15) 0%,
+      rgba(245, 158, 11, 0.1) 100%);
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.fun-fact i {
+  color: #fbbf24;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.fun-fact span {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== 关闭按钮 ==================== */
+.go-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  top: 12px;
+  right: 12px;
+}
+
+.close-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-wrapper:hover {
+  background: rgba(239, 68, 68, 0.8);
+  transform: rotate(90deg);
+}
+
+.close-icon {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==================== 全屏 3D 模型覆盖层 ==================== */
+.model-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  cursor: grab;
+}
+
+.model-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.model-overlay a-scene {
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+}
+
+/* 确保 A-Frame canvas 透明 */
+.model-overlay .a-canvas {
+  background: transparent !important;
+}
+
+/* ==================== AR 场景样式 ==================== */
+#arScene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 480px) {
+  .info-panel {
+    max-width: 95%;
+    padding: 20px;
+    bottom: 20px;
+    max-height: 50vh;
+  }
+
+  .info-header h2 {
+    font-size: 20px;
+  }
+
+  .specs {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .spec {
+    padding: 10px 6px;
+  }
+
+  .icon-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+    right: 15px;
+  }
+
+  .info-icon {
+    top: 15px;
+  }
+
+  .rotate-icon {
+    top: 75px;
+  }
+
+  .scale-icon {
+    top: 135px;
+  }
+
+  .watermark {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .touch-hint {
+    bottom: 80px;
+    padding: 10px 18px;
+  }
+}
+
+/* ==================== 横屏模式 ==================== */
+@media (orientation: landscape) and (max-height: 500px) {
+  .info-panel {
+    max-height: 80vh;
+    bottom: 10px;
+    max-width: 350px;
+    left: auto;
+    right: 80px;
+    transform: none;
+  }
+
+  .touch-hint {
+    bottom: 10px;
+    left: 20px;
+    transform: none;
+  }
+}
+
+/* ==================== 围绕模型的浮动信息卡片 ==================== */
+.floating-info-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* 基础浮动卡片样式 */
+.float-card {
+  position: absolute;
+  pointer-events: auto;
+  animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+.float-card-inner {
+  background: linear-gradient(135deg,
+      rgba(15, 23, 42, 0.85) 0%,
+      rgba(30, 41, 59, 0.9) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 0 20px rgba(74, 222, 128, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.float-card:hover .float-card-inner {
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(74, 222, 128, 0.5);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 0 30px rgba(74, 222, 128, 0.2);
+}
+
+/* 浮动动画 */
+@keyframes floatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 悬浮动画 */
+@keyframes gentleFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* 图标样式 */
+.float-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.float-icon i {
+  font-size: 18px;
+  color: #4ade80;
+}
+
+.float-icon.category-icon {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+}
+
+.float-icon.category-icon i {
+  color: #a855f7;
+}
+
+.float-icon.feature-icon {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+}
+
+.float-icon.feature-icon i {
+  color: #fbbf24;
+}
+
+/* 内容样式 */
+.float-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.float-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.float-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ========== 各个卡片位置 ========== */
+
+/* 顶部：植物名称 */
+.float-top {
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0.1s;
+}
+
+.float-top .float-card-inner {
+  flex-direction: column;
+  text-align: center;
+  padding: 16px 28px;
+  background: linear-gradient(135deg,
+      rgba(74, 222, 128, 0.15) 0%,
+      rgba(15, 23, 42, 0.9) 30%,
+      rgba(30, 41, 59, 0.95) 100%);
+  border-color: rgba(74, 222, 128, 0.4);
+}
+
+.plant-name-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.plant-name-badge i {
+  font-size: 24px;
+  color: #4ade80;
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+.main-name {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #fff 0%, #4ade80 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sub-name {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  letter-spacing: 1px;
+}
+
+/* 左上：科属 */
+.float-left-top {
+  top: 28%;
+  left: 5%;
+  animation-delay: 0.2s;
+}
+
+/* 右上：产地 */
+.float-right-top {
+  top: 28%;
+  right: 5%;
+  animation-delay: 0.3s;
+}
+
+.float-right-top .float-card-inner {
+  flex-direction: row-reverse;
+}
+
+.float-right-top .float-content {
+  text-align: right;
+}
+
+/* 左下：分类 */
+.float-left-bottom {
+  top: 58%;
+  left: 5%;
+  animation-delay: 0.4s;
+}
+
+/* 右下：特性 */
+.float-right-bottom {
+  top: 58%;
+  right: 5%;
+  animation-delay: 0.5s;
+}
+
+.float-right-bottom .float-card-inner {
+  flex-direction: row-reverse;
+}
+
+.float-right-bottom .float-content {
+  text-align: right;
+}
+
+/* 底部：趣闻卡片 */
+.float-bottom {
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0.6s;
+  max-width: 85%;
+}
+
+.fun-fact-card .float-card-inner {
+  flex-direction: column;
+  padding: 16px 20px;
+  background: linear-gradient(135deg,
+      rgba(251, 191, 36, 0.1) 0%,
+      rgba(15, 23, 42, 0.9) 30%,
+      rgba(30, 41, 59, 0.95) 100%);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.fun-fact-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.fun-fact-header i {
+  font-size: 18px;
+  color: #fbbf24;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.fun-fact-header span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fbbf24;
+  letter-spacing: 1px;
+}
+
+.fun-fact-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+  }
+}
+
+/* ========== 连接线 ========== */
+.connector-line {
+  position: absolute;
+  background: linear-gradient(90deg, rgba(74, 222, 128, 0.5), rgba(74, 222, 128, 0.1));
+  height: 2px;
+  width: 40px;
+  border-radius: 1px;
+  opacity: 0.6;
+}
+
+.float-left-top .connector-line {
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%) rotate(25deg);
+}
+
+.float-right-top .connector-line {
+  left: -45px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-25deg);
+  background: linear-gradient(90deg, rgba(74, 222, 128, 0.1), rgba(74, 222, 128, 0.5));
+}
+
+.float-left-bottom .connector-line {
+  right: -45px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-25deg);
+}
+
+.float-right-bottom .connector-line {
+  left: -45px;
+  top: 50%;
+  transform: translateY(-50%) rotate(25deg);
+  background: linear-gradient(90deg, rgba(74, 222, 128, 0.1), rgba(74, 222, 128, 0.5));
+}
+
+/* ========== 中心指示器 ========== */
+.center-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.center-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(74, 222, 128, 0.3);
+  border-radius: 50%;
+  animation: rotate-slow 10s linear infinite;
+}
+
+.center-ring::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.8);
+}
+
+.center-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, rgba(74, 222, 128, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: center-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rotate-slow {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes center-pulse {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.3;
+  }
+}
+
+/* ========== 响应式适配 (手机端优化) ========== */
+@media (max-width: 480px) {
+
+  /* 容器改为 Flex 布局以辅助定位 */
+  .floating-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+
+  /* 通用移除连接线和中心指示器 */
+  .connector-line,
+  .center-indicator {
+    display: none;
+  }
+
+  /* 1. 顶部植物名称 - 更紧凑 */
+  .float-top {
+    position: relative;
+    /* 重置绝对定位 */
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-top: 40px;
+    /* 避开顶部状态栏 */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    /* 让点击穿透到模型 */
+  }
+
+  .float-top .float-card-inner {
+    background: rgba(15, 23, 42, 0.6);
+    /* 更通透的背景 */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 30px;
+    flex-direction: row;
+    /* 横向排列 */
+    align-items: baseline;
+    gap: 8px;
+    pointer-events: auto;
+  }
+
+  .plant-name-badge {
+    margin: 0;
+  }
+
+  .plant-name-badge i {
+    font-size: 16px;
+    margin-right: 4px;
+  }
+
+  .main-name {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .sub-name {
+    display: none;
+    /* 手机端隐藏英文名以节省空间 */
+  }
+
+  /* 2. 属性标签组 - 改为底部水平滚动栏 */
+  /* 创建一个虚拟容器来管理这些散落的 div */
+  .float-left-top,
+  .float-right-top,
+  .float-left-bottom,
+  .float-right-bottom {
+    position: fixed;
+    /* 还是固定定位，但位置统一由 bottom 控制 */
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    bottom: 110px;
+    /* 位于趣闻卡片上方 */
+    width: auto;
+    opacity: 0;
+    /* 初始透明，由动画显示 */
+    animation: slideUpFade 0.5s ease forwards;
+  }
+
+  /* 手动计算每个卡片的横向位置，模拟水平排列 */
+  .float-left-top {
+    left: 16px;
+    animation-delay: 0.1s;
+  }
+
+  /* 科属 */
+  .float-right-top {
+    left: 100px;
+    animation-delay: 0.2s;
+  }
+
+  /* 产地 */
+  .float-left-bottom {
+    left: 195px;
+    animation-delay: 0.3s;
+  }
+
+  /* 分类 */
+  .float-right-bottom {
+    left: 300px;
+    animation-delay: 0.4s;
+  }
+
+  /* 特性 */
+
+  /* 属性卡片样式微调 - 胶囊样式 */
+  .float-left-top .float-card-inner,
+  .float-right-top .float-card-inner,
+  .float-left-bottom .float-card-inner,
+  .float-right-bottom .float-card-inner {
+    flex-direction: row !important;
+    padding: 6px 12px;
+    border-radius: 20px;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .float-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+
+  .float-icon i {
+    font-size: 12px;
+  }
+
+  .float-label {
+    display: none;
+    /* 隐藏标签名，只显示图标和值 */
+  }
+
+  .float-value {
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .float-card:hover .float-card-inner {
+    transform: scale(1.05);
+    /* 轻微缩放 */
+  }
+
+  /* 3. 底部趣闻卡片 */
+  .float-bottom {
+    bottom: 30px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    animation-delay: 0.5s;
+  }
+
+  .fun-fact-card .float-card-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 12px 16px;
+    background: rgba(15, 23, 42, 0.85);
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .fun-fact-header {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .fun-fact-header span {
+    display: none;
+    /* 手机端隐藏标题文字，只留灯泡图标 */
+  }
+
+  .fun-fact-header i {
+    font-size: 20px;
+    margin-top: 2px;
+  }
+
+  .fun-fact-text {
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* 最多显示2行 */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 4. 调整原有 UI */
+  .icon-btn {
+    top: auto !important;
+    bottom: 180px;
+    /* 抬高操作按钮，避开底部属性栏 */
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .info-icon {
+    bottom: 290px;
+  }
+
+  .rotate-icon {
+    bottom: 235px;
+    top: auto;
+  }
+
+  .scale-icon {
+    bottom: 180px;
+    top: auto;
+  }
+
+  .watermark {
+    top: 45px;
+    left: 16px;
+    padding: 6px 12px;
+    font-size: 14px;
+    background: transparent;
+    /* 极简模式 */
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .touch-hint {
+    display: none;
+    /* 手机端已有直观反馈，隐藏提示以减少遮挡 */
+  }
+
+  /* 动画 */
+  @keyframes slideUpFade {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* 横屏模式适配 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .float-top {
+    top: 5%;
+  }
+
+  .float-left-top,
+  .float-right-top {
+    top: 35%;
+  }
+
+  .float-left-bottom,
+  .float-right-bottom {
+    top: 65%;
+  }
+
+  .float-bottom {
+    bottom: 5%;
+    max-width: 60%;
+  }
+
+  .main-name {
+    font-size: 18px;
+  }
+}

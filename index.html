@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>PlantAR — 植物识别 AR 展示</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!-- 使用与 Gunify 完全相同的 CDN -->
+    <script
+        src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+
+<body style="margin: 0px; overflow: hidden">
+
+    <!-- Loading (AR.js 会自动隐藏这个元素) -->
+    <div class="arjs-loader">
+        <div class="spinner"></div>
+        <p class="loading-text">正在初始化 AR...</p>
+    </div>
+
+    <!-- Watermark -->
+    <div class="watermark">
+        <i class="fa-solid fa-leaf"></i>
+        PlantAR
+    </div>
+
+    <!-- Control Icons -->
+    <div class="icon-btn info-icon">
+        <i class="fa-solid fa-info"></i>
+    </div>
+    <div class="icon-btn rotate-icon">
+        <i class="fa-solid fa-rotate"></i>
+    </div>
+    <div class="icon-btn scale-icon">
+        <i class="fa-solid fa-expand"></i>
+    </div>
+
+    <!-- 扫描提示 -->
+    <div id="scanHint"
+        style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); color: white; text-align: center; z-index: 100; pointer-events: none;">
+        <div style="background: rgba(0,0,0,0.6); padding: 15px 25px; border-radius: 20px; backdrop-filter: blur(5px);">
+            <i class="fa-solid fa-camera" style="font-size: 24px; margin-bottom: 8px; color: #4ade80;"></i>
+            <p style="margin: 0; font-size: 14px;">请对准植物识别图</p>
+        </div>
+    </div>
+
+    <!-- 浮动信息 UI (初始隐藏) -->
+    <div class="floating-info-container" id="floatingInfo" style="display: none;">
+        <div class="float-card float-top" id="floatName">
+            <div class="float-card-inner">
+                <div class="plant-name-badge">
+                    <i class="fa-solid fa-leaf"></i>
+                    <span class="main-name" id="floatTitle">滴水观音</span>
+                </div>
+                <span class="sub-name" id="floatEnglish">Alocasia macrorrhizos</span>
+            </div>
+        </div>
+
+        <div class="float-card float-left-top" id="floatFamily">
+            <div class="float-card-inner">
+                <div class="float-icon"><i class="fa-solid fa-seedling"></i></div>
+                <div class="float-content">
+                    <span class="float-label">科属</span>
+                    <span class="float-value" id="floatFamilyValue">天南星科</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="float-card float-right-top" id="floatOrigin">
+            <div class="float-card-inner">
+                <div class="float-icon"><i class="fa-solid fa-earth-asia"></i></div>
+                <div class="float-content">
+                    <span class="float-label">产地</span>
+                    <span class="float-value" id="floatOriginValue">亚洲热带</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="float-card float-left-bottom" id="floatCategory">
+            <div class="float-card-inner">
+                <div class="float-icon category-icon"><i class="fa-solid fa-tag"></i></div>
+                <div class="float-content">
+                    <span class="float-label">分类</span>
+                    <span class="float-value" id="floatCategoryValue">多年生草本</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="float-card float-right-bottom" id="floatFeature">
+            <div class="float-card-inner">
+                <div class="float-icon feature-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="float-content">
+                    <span class="float-label">特性</span>
+                    <span class="float-value" id="floatFeatureValue">叶大如伞</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="float-card float-bottom fun-fact-card" id="floatFunFact">
+            <div class="float-card-inner">
+                <div class="fun-fact-header">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>你知道吗？</span>
+                </div>
+                <p class="fun-fact-text" id="floatFunFactText">
+                    滴水观音在空气湿度高时，叶尖会凝结水珠滴落，这是植物的"吐水现象"！
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详细信息面板 -->
+    <div class="info-panel" id="infoPanel" style="display: none;">
+        <div class="info-header">
+            <div class="title-section">
+                <h2 id="plantTitle">滴水观音</h2>
+                <span class="plant-english" id="plantEnglish">Alocasia macrorrhizos</span>
+            </div>
+            <span class="plant-category" id="plantCategory">多年生草本</span>
+        </div>
+        <p id="plantDescription">滴水观音又称海芋、象耳芋，是天南星科海芋属植物。因其叶片巨大如象耳，且在湿度大时叶尖会滴水而得名。</p>
+        <div class="go-corner">
+            <div class="go-close close-wrapper">
+                <i class="fa-solid fa-xmark close-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- A-Frame AR 场景 (使用与 Gunify 完全相同的配置) -->
+    <a-scene vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true;" embedded
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+        <!-- NFT Marker: 滴水观音 -->
+        <a-nft type="nft" id="elephantEarMarker" url="./markers/elephant_ear/elephant_ear" smooth="true"
+            smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+            <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="80 80 80"
+                position="50 0 -100" rotation="0 0 0"></a-entity>
+        </a-nft>
+
+        <!-- Lighting -->
+        <a-entity light="type: ambient; intensity: 2"></a-entity>
+        <a-entity light="type: directional; intensity: 3" position="1 1 1"></a-entity>
+
+        <!-- Camera -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script src="./script-nft.js" defer></script>
+</body>
+
+</html>
