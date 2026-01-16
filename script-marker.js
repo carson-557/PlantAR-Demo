@@ -18,7 +18,7 @@ const plantData = {
 };
 
 // ==================== DOM 元素 ====================
-const hiroMarker = document.getElementById("hiroMarker");
+const plantMarker = document.getElementById("plantMarker");
 const plantModel = document.getElementById("plantModel");
 const infoPanel = document.getElementById("infoPanel");
 const floatingInfo = document.getElementById("floatingInfo");
@@ -37,9 +37,9 @@ console.log("🌿 PlantAR Hiro Marker 版本启动");
 if (infoPanel) infoPanel.style.display = "none";
 
 // ==================== Marker 事件 ====================
-if (hiroMarker) {
-    hiroMarker.addEventListener("markerFound", () => {
-        console.log("✅ 识别到 Hiro 标记！显示植物模型");
+if (plantMarker) {
+    plantMarker.addEventListener("markerFound", () => {
+        console.log("✅ 识别到植物标记！显示植物模型");
         isMarkerVisible = true;
 
         // 隐藏扫描提示
@@ -49,8 +49,8 @@ if (hiroMarker) {
         if (floatingInfo) floatingInfo.style.display = "flex";
     });
 
-    hiroMarker.addEventListener("markerLost", () => {
-        console.log("❌ Hiro 标记丢失");
+    plantMarker.addEventListener("markerLost", () => {
+        console.log("❌ 植物标记丢失");
         isMarkerVisible = false;
 
         // 显示扫描提示
