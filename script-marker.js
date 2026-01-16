@@ -138,5 +138,148 @@ if (scene) {
     });
 }
 
-console.log("📱 提示: 请扫描 Hiro 标记以显示植物模型");
-console.log("🔗 Hiro 标记图片: https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png");
+console.log("📱 提示: 请扫描植物标记以显示植物模型");
+console.log("👆 单指滑动旋转模型，双指捏合缩放模型");
+
+// ==================== 手势控制 ====================
+// 旋转相关变量
+let currentRotationY = 0;
+let currentRotationX = -90; // 初始 X 旋转（模型默认朝向）
+let touchStartX = 0;
+let touchStartY = 0;
+let isTouching = false;
+
+// 缩放相关变量
+let initialPinchDistance = 0;
+let isPinching = false;
+let baseScale = 0.3;
+
+/**
+ * 计算两点之间的距离（用于双指缩放）
+ */
+function getPinchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * 应用旋转到模型
+ */
+function applyRotation() {
+    if (plantModel && isMarkerVisible) {
+        plantModel.setAttribute("rotation", `${currentRotationX} ${currentRotationY} 0`);
+    }
+}
+
+/**
+ * 应用缩放到模型
+ */
+function applyScale(scale) {
+    if (plantModel && isMarkerVisible) {
+        currentScale = Math.max(0.1, Math.min(1.0, scale)); // 限制缩放范围
+        plantModel.setAttribute("scale", `${currentScale} ${currentScale} ${currentScale}`);
+    }
+}
+
+// ==================== 触摸事件监听 ====================
+
+document.addEventListener("touchstart", (e) => {
+    if (!isMarkerVisible) return;
+
+    if (e.touches.length === 1) {
+        // 单指 - 准备旋转
+        isTouching = true;
+        isPinching = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+        // 双指 - 准备缩放
+        isPinching = true;
+        isTouching = false;
+        initialPinchDistance = getPinchDistance(e.touches);
+        baseScale = currentScale;
+    }
+}, { passive: true });
+
+document.addEventListener("touchmove", (e) => {
+    if (!isMarkerVisible) return;
+
+    if (isTouching && e.touches.length === 1) {
+        // 单指滑动 - 旋转模型
+        const deltaX = e.touches[0].clientX - touchStartX;
+        const deltaY = e.touches[0].clientY - touchStartY;
+
+        // 水平滑动控制 Y 轴旋转
+        currentRotationY += deltaX * 0.5;
+
+        // 垂直滑动控制 X 轴旋转（限制范围避免翻转）
+        currentRotationX = Math.max(-150, Math.min(-30, currentRotationX + deltaY * 0.3));
+
+        applyRotation();
+
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    } else if (isPinching && e.touches.length === 2) {
+        // 双指捏合 - 缩放模型
+        const currentPinchDistance = getPinchDistance(e.touches);
+        const scaleFactor = currentPinchDistance / initialPinchDistance;
+        const newScale = baseScale * scaleFactor;
+
+        applyScale(newScale);
+    }
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+    if (e.touches.length === 0) {
+        isTouching = false;
+        isPinching = false;
+    } else if (e.touches.length === 1) {
+        // 从双指变为单指
+        isPinching = false;
+        isTouching = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }
+}, { passive: true });
+
+// ==================== 鼠标控制（电脑端） ====================
+let isMouseDown = false;
+let mouseStartX = 0;
+let mouseStartY = 0;
+
+document.addEventListener("mousedown", (e) => {
+    if (!isMarkerVisible) return;
+    isMouseDown = true;
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+});
+
+document.addEventListener("mousemove", (e) => {
+    if (!isMarkerVisible || !isMouseDown) return;
+
+    const deltaX = e.clientX - mouseStartX;
+    const deltaY = e.clientY - mouseStartY;
+
+    currentRotationY += deltaX * 0.5;
+    currentRotationX = Math.max(-150, Math.min(-30, currentRotationX + deltaY * 0.3));
+
+    applyRotation();
+
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+});
+
+document.addEventListener("mouseup", () => {
+    isMouseDown = false;
+});
+
+// 鼠标滚轮缩放
+document.addEventListener("wheel", (e) => {
+    if (!isMarkerVisible) return;
+
+    const scaleDelta = e.deltaY > 0 ? -0.05 : 0.05;
+    applyScale(currentScale + scaleDelta);
+}, { passive: true });
+
+console.log("✅ 手势控制已启用");
