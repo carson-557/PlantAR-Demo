@@ -10,6 +10,8 @@
     <!-- A-Frame + AR.js (Marker 版本，比 NFT 更稳定) -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- A-Frame Extras - 支持 GLTF 动画 -->
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -134,9 +136,9 @@
         vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
         <!-- Hiro Marker -->
         <a-marker preset="hiro" id="hiroMarker">
-            <!-- 3D 植物模型 -->
-            <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="0.05 0.05 0.05"
-                position="0 0 0" rotation="-90 0 0"></a-entity>
+            <!-- 3D 植物模型 (放大到约 1/4 屏幕) -->
+            <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="0.3 0.3 0.3"
+                position="0 0.5 0" rotation="-90 0 0" animation-mixer="loop: repeat; timeScale: 1"></a-entity>
         </a-marker>
 
         <!-- 摄像头实体 -->

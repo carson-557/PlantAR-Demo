@@ -27,7 +27,7 @@ const infoButton = document.querySelector(".info-icon");
 const scaleButton = document.querySelector(".scale-icon");
 const closeButton = document.querySelector(".close-wrapper");
 
-let currentScale = 0.05;
+let currentScale = 0.3;
 let isMarkerVisible = false;
 
 // ==================== 初始化 ====================
@@ -98,13 +98,13 @@ if (scaleButton) {
     scaleButton.addEventListener("click", () => {
         if (!plantModel || !isMarkerVisible) return;
 
-        // 循环切换缩放: 0.05 -> 0.08 -> 0.03 -> 0.05
-        if (currentScale === 0.05) {
-            currentScale = 0.08;
-        } else if (currentScale === 0.08) {
-            currentScale = 0.03;
+        // 循环切换缩放: 0.3 -> 0.5 -> 0.2 -> 0.3
+        if (currentScale === 0.3) {
+            currentScale = 0.5;
+        } else if (currentScale === 0.5) {
+            currentScale = 0.2;
         } else {
-            currentScale = 0.05;
+            currentScale = 0.3;
         }
 
         plantModel.setAttribute("scale", `${currentScale} ${currentScale} ${currentScale}`);
