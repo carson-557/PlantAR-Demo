@@ -136,11 +136,11 @@
         vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
         <!-- 自定义植物标记 (增加平滑参数减少晃动) -->
         <a-marker type="pattern" url="./pattern-plant_marker_crop_white.patt" id="plantMarker" smooth="true"
-            smoothCount="15" smoothTolerance="0.01" smoothThreshold="5">
-            <!-- 3D 植物模型 (倒放动画：从小到大生长) -->
+            smoothCount="30" smoothTolerance="0.005" smoothThreshold="8">
+            <!-- 3D 植物模型 (播放一次生长动画，停在完整状态) -->
             <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="0.3 0.3 0.3"
                 position="0 0.5 0" rotation="-90 0 0"
-                animation-mixer="loop: once; clampWhenFinished: true; timeScale: -1"></a-entity>
+                animation-mixer="loop: once; clampWhenFinished: true; timeScale: 1"></a-entity>
         </a-marker>
 
         <!-- 摄像头实体 -->

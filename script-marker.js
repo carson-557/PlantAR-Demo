@@ -48,21 +48,13 @@ if (plantMarker) {
         // 显示浮动 UI
         if (floatingInfo) floatingInfo.style.display = "flex";
 
-        // 重置动画，确保从头播放
+        // 播放动画（每次识别都从头播放）
         if (plantModel) {
-            // 获取动画混合器组件
-            const mixer = plantModel.components['animation-mixer'];
-            if (mixer && mixer.mixer) {
-                // 重置所有动画到开始位置并播放
-                mixer.mixer.stopAllAction();
-                const clips = mixer.mixer._actions;
-                if (clips && clips.length > 0) {
-                    clips.forEach(action => {
-                        action.reset();
-                        action.play();
-                    });
-                }
-            }
+            // 先移除再重新添加 animation-mixer 来重置动画
+            plantModel.removeAttribute('animation-mixer');
+            setTimeout(() => {
+                plantModel.setAttribute('animation-mixer', 'loop: once; clampWhenFinished: true; timeScale: 1');
+            }, 100);
         }
     });
 
