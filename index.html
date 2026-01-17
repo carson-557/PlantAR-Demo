@@ -134,11 +134,13 @@
     <a-scene embedded
         arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true; precision: medium;">
-        <!-- 自定义植物标记 -->
-        <a-marker type="pattern" url="./pattern-plant_marker_crop_white.patt" id="plantMarker">
-            <!-- 3D 植物模型 (放大到约 1/4 屏幕) -->
+        <!-- 自定义植物标记 (增加平滑参数减少晃动) -->
+        <a-marker type="pattern" url="./pattern-plant_marker_crop_white.patt" id="plantMarker" smooth="true"
+            smoothCount="15" smoothTolerance="0.01" smoothThreshold="5">
+            <!-- 3D 植物模型 -->
             <a-entity id="plantModel" gltf-model="./models/elephant_ear/scene.gltf" scale="0.3 0.3 0.3"
-                position="0 0.5 0" rotation="-90 0 0" animation-mixer="loop: repeat; timeScale: 1"></a-entity>
+                position="0 0.5 0" rotation="-90 0 0"
+                animation-mixer="loop: once; clampWhenFinished: true; timeScale: 1"></a-entity>
         </a-marker>
 
         <!-- 摄像头实体 -->
