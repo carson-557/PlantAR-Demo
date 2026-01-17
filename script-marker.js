@@ -47,6 +47,23 @@ if (plantMarker) {
 
         // 显示浮动 UI
         if (floatingInfo) floatingInfo.style.display = "flex";
+
+        // 重置动画，确保从头播放
+        if (plantModel) {
+            // 获取动画混合器组件
+            const mixer = plantModel.components['animation-mixer'];
+            if (mixer && mixer.mixer) {
+                // 重置所有动画到开始位置并播放
+                mixer.mixer.stopAllAction();
+                const clips = mixer.mixer._actions;
+                if (clips && clips.length > 0) {
+                    clips.forEach(action => {
+                        action.reset();
+                        action.play();
+                    });
+                }
+            }
+        }
     });
 
     plantMarker.addEventListener("markerLost", () => {
